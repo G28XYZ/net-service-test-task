@@ -1,31 +1,46 @@
 # Junior Fullstack Test Task
 
-Тестовое задание представляет собой мини-сервис управления виртуальной инфраструктурой:
+Мини-сервис для управления виртуальной инфраструктурой.
 
+В проекте уже есть:
 - авторизация пользователя;
 - просмотр списка виртуальных машин;
 - просмотр списка сетей и интерфейсов;
 - создание виртуальной машины;
 - создание сетевого интерфейса;
-- заготовленные API-обработчики и UI для включения/выключения ВМ и интерфейса.
+- удаление виртуальной машины;
+- UI с переключателями `ON/OFF` для ВМ и интерфейсов;
+- backend-заготовки для обработчиков смены статуса ВМ и интерфейса.
 
 ## Стек
 
 - Backend: FastAPI
-- Database: PostgreSQL, в проекте есть заготовка подключения в [backend/app/database/main.py](/Users/royalfly/Documents/GitHub/net-service-test-task/backend/app/database/main.py:1)
+- Database: PostgreSQL + SQLAlchemy Async
 - Frontend: React + Vite
 
 ## Что уже реализовано
 
-- логин по демо-учетке `admin` / `admin`;
-- токен-авторизация через `Bearer`;
+- демо-логин `admin` / `admin`;
+- Bearer-авторизация;
 - сохранение сетей, ВМ и интерфейсов в PostgreSQL;
-- автоматическое создание таблиц и сидирование демо-данных при старте backend;
-- модели `VirtualMachine`, `NetworkInterface`, `Network` с базовыми полями `id`, `name`, `status`, `createdAt`;
+- автоматическое создание таблиц и сидирование стартовых данных при запуске backend;
+- модели и схемы с базовыми полями `id`, `name`, `status`, `createdAt`;
 - создание ВМ;
 - создание интерфейса с привязкой к ВМ и сети;
-- React-интерфейс для входа, просмотра и создания сущностей;
-- кнопки для смены статуса ВМ и интерфейса.
+- удаление ВМ;
+- левое меню с разделами:
+  - список ВМ;
+  - список интерфейсов;
+  - создание элементов;
+- хедер с текущим пользователем и кнопкой выхода;
+- UI-кнопка удаления интерфейса без backend-логики;
+- комментарии в backend и frontend коде.
+
+## Что важно знать
+
+- Авторизация сейчас моковая и описана в `backend/app/services/auth.py`.
+- Данные инфраструктуры сохраняются в PostgreSQL.
+- Обработчики смены статуса ВМ и интерфейса намеренно не реализованы и возвращают `501 Not Implemented`.
 
 ## Что нужно сделать кандидату
 
@@ -36,10 +51,10 @@
 
 Точки входа:
 
-- [backend/app/api/routes/virtual_machines.py](/Users/royalfly/Documents/GitHub/net-service-test-task/backend/app/api/routes/virtual_machines.py:51)
-- [backend/app/api/routes/interfaces.py](/Users/royalfly/Documents/GitHub/net-service-test-task/backend/app/api/routes/interfaces.py:65)
+- `backend/app/api/routes/virtual_machines.py`
+- `backend/app/api/routes/interfaces.py`
 
-Сейчас эти методы возвращают `501 Not Implemented`.
+Сейчас эти обработчики только проверяют существование сущности и возвращают `501 Not Implemented`.
 
 ## Ожидаемое поведение
 
@@ -49,7 +64,7 @@
 - Если передан недопустимый статус, нужно вернуть `400`.
 - После успешного изменения должен вернуться обновленный объект.
 
-Можно расширить логику валидации, если кандидат сочтет это нужным.
+При желании кандидат может добавить дополнительную валидацию и тесты.
 
 ## Запуск backend
 
@@ -84,19 +99,36 @@ make dev
 
 `make dev` запускает backend и frontend одновременно.
 
-## Как проверять
+## Как проверить вручную
 
-- Войти под `admin` / `admin`
-- Создать новую ВМ
-- Создать новый интерфейс
-- Переключить `ON/OFF` для ВМ
-- Переключить `ON/OFF` для интерфейса
-- Убедиться, что после реализации обработчиков статус действительно меняется в ответе API и на UI
+1. Войти под `admin` / `admin`.
+2. Перейти в раздел `Создание элементов`.
+3. Создать новую ВМ.
+4. Создать новый интерфейс.
+5. Перейти в `Список ВМ` и удалить одну из ВМ.
+6. Попробовать переключить `ON/OFF` для ВМ.
+7. Попробовать переключить `ON/OFF` для интерфейса.
+8. Убедиться, что до реализации тестового задания backend возвращает `501` именно на status-обработчиках.
 
-## Структура
+## Структура проекта
 
-- [backend/app/main.py](/Users/royalfly/Documents/GitHub/net-service-test-task/backend/app/main.py:1) - инициализация FastAPI
-- [backend/app/api/routes](/Users/royalfly/Documents/GitHub/net-service-test-task/backend/app/api/routes) - роуты
-- [backend/app/database](/Users/royalfly/Documents/GitHub/net-service-test-task/backend/app/database) - подключение к БД, сессии и инициализация схемы
-- [frontend/src/App.jsx](/Users/royalfly/Documents/GitHub/net-service-test-task/frontend/src/App.jsx:1) - основной экран
-- [frontend/src/api/client.js](/Users/royalfly/Documents/GitHub/net-service-test-task/frontend/src/api/client.js:1) - запросы к backend
+- `backend/app/main.py` — инициализация FastAPI и startup-хук.
+- `backend/app/api/routes` — HTTP-роуты приложения.
+- `backend/app/api/dependencies.py` — зависимости FastAPI для пользователя и сессии БД.
+- `backend/app/database` — engine, session, init и проверка подключения к БД.
+- `backend/app/models/db.py` — ORM-модели таблиц PostgreSQL.
+- `backend/app/models/entities.py` — pydantic-сущности доменной модели.
+- `backend/app/schemas` — схемы запросов и ответов API.
+- `backend/app/services/auth.py` — моковая авторизация.
+- `frontend/src/App.jsx` — основной экран приложения.
+- `frontend/src/components` — формы и карточки интерфейса.
+- `frontend/src/api/client.js` — клиент запросов к backend.
+
+## Демо-данные
+
+После первого запуска в БД создаются:
+- две сети;
+- две виртуальные машины;
+- два сетевых интерфейса.
+
+Это нужно для того, чтобы тестовое можно было проверить сразу после запуска без ручного наполнения базы.
