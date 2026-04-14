@@ -66,28 +66,6 @@
 
 При желании кандидат может добавить дополнительную валидацию и тесты.
 
-## Запуск backend
-
-```bash
-make backend-install
-make backend-run
-```
-
-Проверка подключения к PostgreSQL:
-
-```bash
-make backend-db-check
-```
-
-## Запуск frontend
-
-```bash
-make frontend-install
-make frontend-run
-```
-
-Frontend поднимается на `http://localhost:5173`, backend ожидается на `http://127.0.0.1:8000`.
-
 После первого запуска backend автоматически создаст таблицы в PostgreSQL и заполнит их начальными данными.
 
 ## Быстрый старт
@@ -98,6 +76,8 @@ make dev
 ```
 
 `make dev` запускает backend и frontend одновременно.
+
+Frontend поднимается на `http://localhost:5173`, backend ожидается на `http://127.0.0.1:8000`.
 
 ## Как проверить вручную
 
